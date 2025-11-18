@@ -1,0 +1,19 @@
+version: "3.9"
+
+services:
+  app:
+    build: .
+    container_name: entregas_app
+    working_dir: /app
+    # Montamos el código local para que no tengas que rebuild por cada cambio
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    # Comando por defecto (puedes cambiarlo al volar)
+    command: >
+      python -m src.main
+      --env develop
+      --start_date 2024-01-01
+      --end_date 2024-06-30
+      --country SV

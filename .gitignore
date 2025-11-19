@@ -10,3 +10,5 @@ __pycache__/
 *.log
 .ipynb_checkpoints/
 *.code-workspace
+data/processed/*
+data/raw/*

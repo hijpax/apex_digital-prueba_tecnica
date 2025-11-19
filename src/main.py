@@ -2,7 +2,7 @@
 from omegaconf import OmegaConf
 from src.utils.spark_utils import create_spark
 from src.utils.cli_utils import parse_args
-from src.pipeline import reader, transformers
+from src.pipeline import reader, transformers, dq_checks
 
 def load_config(env: str, cli_args) -> dict:
     base = OmegaConf.load("config/base.yml")
@@ -27,7 +27,9 @@ def main():
 
     df_raw = reader.read_input(spark, config.paths.input)
 
-    df_clean = transformers.apply_business_rules(df_raw, config)
+    df_clean = dq_checks.apply_dq_rules(df_raw, config)
+
+    df_clean = transformers.apply_business_rules(df_clean, config)
 
     df_clean.show()
 

@@ -55,7 +55,7 @@ def normalize_units(df: DataFrame, cfg) -> DataFrame:
 
     df = (
         df.withColumn("unidad", f.lit(cfg.units.base_unit))
-        #.drop("unidad_original","cantidad_original")
+        # .drop("unidad_original","cantidad_original")
     )
 
     return df
@@ -65,31 +65,39 @@ def add_delivery_type_columns(df: DataFrame, cfg) -> DataFrame:
     routine = cfg.delivery_types.routine      # ["ZPRE", "ZVE1"]
     bonus = cfg.delivery_types.bonus          # ["Z04", "Z05"]
 
+    group_cols = ["pais", "fecha_proceso", "transporte", "ruta", "material", "precio","unidad"]
+
     df = df.filter(f.col("tipo_entrega").isin(*(routine + bonus)))
 
-    df = df.withColumn(
-        "unidades_rutina",
-        f.when(f.col("tipo_entrega").isin(*routine), f.col("cantidad"))
-         .otherwise(0)
-    )
-
-    df = df.withColumn(
-        "unidades_bonificacion",
-        f.when(f.col("tipo_entrega").isin(*bonus), f.col("cantidad"))
-         .otherwise(0)
-    )
-
     df = (
-        df.groupBy("pais","fecha_proceso","transporte","ruta","material","precio","unidad")
+        df.groupBy(*group_cols)
         .agg(
-            f.sum("unidades_rutina").alias("unidades_rutina"),
-            f.sum("unidades_bonificacion").alias("unidades_bonificacion"),
+            f.sum(
+                f.when(
+                    f.col("tipo_entrega").isin(*routine),
+                    f.col("cantidad")
+                ).otherwise(0)
+            ).alias("unidades_rutina"),
+            f.sum(
+                f.when(
+                    f.col("tipo_entrega").isin(*bonus),
+                    f.col("cantidad")
+                ).otherwise(0)
+            ).alias("unidades_bonificacion"),
             f.sum("cantidad").alias("total_unidades")
         )
     )
 
     return df
 
+def add_extra_columns(df: DataFrame, cfg) -> DataFrame:
+
+    df = df.withColumn("anio_proceso", f.year("fecha_proceso"))
+    df = df.withColumn("mes_proceso", f.month("fecha_proceso"))
+
+    df = df.withColumn("es_bonificada", f.col("unidades_bonificacion") > f.lit(0))
+
+    return df
 
 def apply_business_rules(df: DataFrame, cfg) -> DataFrame:
 
@@ -100,6 +108,8 @@ def apply_business_rules(df: DataFrame, cfg) -> DataFrame:
     df = normalize_units(df, cfg)
 
     df = add_delivery_type_columns(df, cfg)
+
+    df = add_extra_columns(df, cfg)
 
     return df
 

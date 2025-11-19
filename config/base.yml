@@ -1,15 +1,14 @@
 app:
-  name: entregas_rutina
-  env: develop    
+  name: entregas_rutina   
 
 paths:
   input: "data/raw/entregas.csv"
   output_base: "data/processed"
 
 filters:
-  start_date: "2025-05-01"
-  end_date: "2025-05-31"
-  country: "GT"    
+  start_date: "2025-01-01"
+  end_date: "2025-09-30"
+  country: ""
 
 units:
   base_unit: "ST"

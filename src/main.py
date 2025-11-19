@@ -2,7 +2,7 @@
 from omegaconf import OmegaConf
 from src.utils.spark_utils import create_spark
 from src.utils.cli_utils import parse_args
-from src.pipeline import reader, transformers, dq_checks
+from src.pipeline import reader, transformers, dq_checks, writer
 
 def load_config(env: str, cli_args) -> dict:
     base = OmegaConf.load("config/base.yml")
@@ -33,9 +33,10 @@ def main():
 
     dq_checks.apply_dq_post(df_clean,config)
 
+    writer.write_partitioned(df_clean,config.paths.output_base)
+
     if config.app.env == "develop":
         df_clean.show()
-
 
 if __name__ == "__main__":
     main()

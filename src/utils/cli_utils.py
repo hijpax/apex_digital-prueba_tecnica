@@ -17,7 +17,7 @@ def parse_args():
         "--env",
         type=str,
         default="develop",
-        choices=["develop", "qa", "main"],
+        choices=["develop", "qa", "prod"],
         help="Entorno de ejecución (default: develop)"
     )
 

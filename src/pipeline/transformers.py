@@ -10,11 +10,10 @@ def filter_by_date_and_country(df: DataFrame, cfg) -> DataFrame:
     end = cfg.filters.end_date
     country = cfg.filters.country
 
-    df_filtered = (
-        df
-        .filter(f.col("fecha_proceso").between(start, end))
-        .filter(f.col("pais") == country)
-    )
+    df_filtered = df.filter(f.col("fecha_proceso").between(start, end))
+
+    if country and country != "":
+        df_filtered = df_filtered.filter(f.col("pais") == country)
 
     return df_filtered
 

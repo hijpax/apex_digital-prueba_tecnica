@@ -41,16 +41,52 @@ def normalize_units(df: DataFrame, cfg) -> DataFrame:
 
     factor = cfg.units.cs_to_st_factor
 
-    df = df.withColumn("cantidad_original", f.col("cantidad"))
+    df = (
+        df.withColumn("cantidad_original", f.col("cantidad"))
+        .withColumn("unidad_original", f.col("unidad"))
+    )
 
     df = df.withColumn(
-        "cantidad_unidades",
+        "cantidad",
         f.when(f.col("unidad") == "CS", f.col("cantidad") * factor)
          .when(f.col("unidad") == "ST", f.col("cantidad"))
          .otherwise(None)
     )
 
-    df = df.withColumn("unidad_base", f.lit(cfg.units.base_unit))
+    df = (
+        df.withColumn("unidad", f.lit(cfg.units.base_unit))
+        #.drop("unidad_original","cantidad_original")
+    )
+
+    return df
+
+def add_delivery_type_columns(df: DataFrame, cfg) -> DataFrame:
+
+    routine = cfg.delivery_types.routine      # ["ZPRE", "ZVE1"]
+    bonus = cfg.delivery_types.bonus          # ["Z04", "Z05"]
+
+    df = df.filter(f.col("tipo_entrega").isin(*(routine + bonus)))
+
+    df = df.withColumn(
+        "unidades_rutina",
+        f.when(f.col("tipo_entrega").isin(*routine), f.col("cantidad"))
+         .otherwise(0)
+    )
+
+    df = df.withColumn(
+        "unidades_bonificacion",
+        f.when(f.col("tipo_entrega").isin(*bonus), f.col("cantidad"))
+         .otherwise(0)
+    )
+
+    df = (
+        df.groupBy("pais","fecha_proceso","transporte","ruta","material","precio","unidad")
+        .agg(
+            f.sum("unidades_rutina").alias("unidades_rutina"),
+            f.sum("unidades_bonificacion").alias("unidades_bonificacion"),
+            f.sum("cantidad").alias("total_unidades")
+        )
+    )
 
     return df
 
@@ -62,6 +98,8 @@ def apply_business_rules(df: DataFrame, cfg) -> DataFrame:
     df = filter_by_date_and_country(df, cfg)
 
     df = normalize_units(df, cfg)
+
+    df = add_delivery_type_columns(df, cfg)
 
     return df
 

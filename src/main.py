@@ -27,11 +27,14 @@ def main():
 
     df_raw = reader.read_input(spark, config.paths.input)
 
-    df_clean = dq_checks.apply_dq_rules(df_raw, config)
+    df_clean = dq_checks.apply_dq_pre(df_raw, config)
 
     df_clean = transformers.apply_business_rules(df_clean, config)
 
-    df_clean.show()
+    dq_checks.apply_dq_post(df_clean,config)
+
+    if config.app.env == "develop":
+        df_clean.show()
 
 
 if __name__ == "__main__":

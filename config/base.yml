@@ -21,6 +21,7 @@ delivery_types:
 
 dq:
   drop_duplicates: true
+  dedup_keys: ["fecha_proceso", "pais", "material", "tipo_entrega","transporte","ruta","cantidad"]
   remove_nulls_in:
     - fecha_proceso
     - pais

@@ -24,7 +24,4 @@ def read_input(spark: SparkSession, input_path: str):
             .csv(input_path)
     )
 
-    # parsear fecha_proceso a DateType
-    df = df.withColumn("fecha_proceso", f.to_date("fecha_proceso", "yyyyMMdd"))
-
     return df

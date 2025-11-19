@@ -12,7 +12,7 @@ def get_schema():
         StructField("material", StringType(), True),
         StructField("precio", DecimalType(), True),
         StructField("cantidad", IntegerType(), True),
-        StructField("unidad", IntegerType(), True)
+        StructField("unidad", StringType(), True)
     ])
 
 def read_input(spark: SparkSession, input_path: str):

@@ -3,12 +3,13 @@ import argparse
 
 def parse_args():
     """
-    Maneja argumentos de línea de comandos para ejecutar el pipeline.
+    Parse command-line arguments for environment selection and optional
+    execution parameters such as date range and country.
 
-    Returns
-    -------
-    argparse.Namespace
+    Returns:
+        argparse.Namespace: Parsed CLI arguments.
     """
+
     parser = argparse.ArgumentParser(
         description="Pipeline de entregas rutine"
     )

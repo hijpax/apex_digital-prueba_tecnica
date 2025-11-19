@@ -20,6 +20,7 @@ def load_config(env: str, cli_args) -> dict:
     return config
 
 def main():
+    
     args = parse_args() 
     config = load_config(args.env,args)
 

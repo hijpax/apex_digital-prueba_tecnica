@@ -2,6 +2,16 @@ from pyspark.sql import SparkSession
 
 
 def create_spark(app_name: str = "entregas_rutina", env: str = "develop") -> SparkSession:
+    """
+    Create and configure a local SparkSession for the pipeline execution.
+
+    Args:
+        app_name (str): Base name of the Spark application.
+        env (str): Execution environment (e.g., develop, qa, prod).
+
+    Returns:
+        SparkSession: Configured Spark session.
+    """
 
     builder = (
         SparkSession.builder
@@ -27,4 +37,11 @@ def create_spark(app_name: str = "entregas_rutina", env: str = "develop") -> Spa
 
 
 def get_spark() -> SparkSession:
+    """
+    Return the currently active SparkSession.
+
+    Returns:
+        SparkSession: Active Spark session or None if not available.
+    """
+
     return SparkSession.getActiveSession()

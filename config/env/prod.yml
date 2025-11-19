@@ -1,0 +1,6 @@
+app:
+  env: prod
+
+paths:
+  input: "data/raw/global_mobility_data_entrega_productos.csv"
+  output_base: "data/processed"

@@ -2,6 +2,18 @@ import pyspark.sql.functions as f
 from pyspark.sql import DataFrame
 
 def apply_dq_pre(df: DataFrame, cfg):
+    """
+    Apply pre-transformation data quality checks to ensure the dataset is valid
+    before business rules are applied.
+
+    Args:
+        df (DataFrame): Raw input DataFrame.
+        cfg: Configuration object defining DQ rules (null removal, valid units, dedup keys).
+
+    Returns:
+        DataFrame: Cleaned dataset ready for transformation.
+    """
+
 
     for col_name in cfg.dq.remove_nulls_in:
         df = df.filter(f.col(col_name).isNotNull())
@@ -11,6 +23,9 @@ def apply_dq_pre(df: DataFrame, cfg):
     df = df.filter(f.col("unidad").isin(*cfg.dq.valid_units))
 
     df = df.filter(f.col("cantidad") > 0)
+
+    # Validar formato de material: AA###### (2 letras + 6 dígitos)
+    df = df.filter(f.col("material").rlike(r"^[A-Z]{2}[0-9]{6}$"))
 
     if cfg.dq.drop_duplicates:
         if cfg.dq.dedup_keys:
@@ -22,6 +37,17 @@ def apply_dq_pre(df: DataFrame, cfg):
 
 
 def apply_dq_post(df: DataFrame, cfg):
+    """
+    Validate that the transformed dataset meets expected business invariants.
+    Raises exceptions if inconsistencies are found.
+
+    Args:
+        df (DataFrame): Fully transformed DataFrame.
+        cfg: Configuration object.
+
+    Returns:
+        None
+    """
 
     # 1) total_unidades > 0
     invalid_total_count = df.filter(f.col("total_unidades") <= 0).count()

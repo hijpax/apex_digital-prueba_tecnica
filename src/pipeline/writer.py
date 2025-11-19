@@ -2,6 +2,16 @@ from pyspark.sql import DataFrame
 import pyspark.sql.functions as f
 
 def write_partitioned(df: DataFrame, output_base_path: str):
+    """
+    Write the processed DataFrame into partitioned folders by date and country.
+
+    Args:
+        df (DataFrame): Cleaned and validated DataFrame to be written.
+        output_base_path (str): Base path where parquet files will be stored.
+
+    Returns:
+        None
+    """
 
     # Opcion con particionado de pyspark
     # df_write = df.withColumn(

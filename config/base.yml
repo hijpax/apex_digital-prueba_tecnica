@@ -7,9 +7,9 @@ paths:
   output_base: "data/processed"
 
 filters:
-  start_date: "2025-01-01"
-  end_date: "2025-03-31"
-  country: "SV"    
+  start_date: "2025-05-01"
+  end_date: "2025-05-31"
+  country: "GT"    
 
 units:
   base_unit: "ST"

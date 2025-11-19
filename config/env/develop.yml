@@ -1,0 +1,6 @@
+app:
+  env: develop
+
+paths:
+  input: "data/raw/entregas_sample.csv"
+  output_base: "data/processed/develop"

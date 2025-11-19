@@ -2,9 +2,12 @@
 from omegaconf import OmegaConf
 from src.utils.spark_utils import create_spark
 from src.utils.cli_utils import parse_args
+from src.pipeline import reader
 
 def load_config(env: str, cli_args) -> dict:
-    config = OmegaConf.load("configs/base.yaml")
+    base = OmegaConf.load("config/base.yml")
+    env_cfg = OmegaConf.load(f"config/env/{env}.yml")
+    config = OmegaConf.merge(base, env_cfg)
 
     # overrides desde CLI
     if cli_args.start_date:
@@ -18,9 +21,14 @@ def load_config(env: str, cli_args) -> dict:
 
 def main():
     args = parse_args() 
-    config = load_config(args.env)
+    config = load_config(args.env,args)
+
     spark = create_spark(app_name=config.app.name, env=config.app.env)
-    return
+
+    df_raw = reader.read_input(spark, config.paths.input)
+
+    df_raw.show()
+
 
 if __name__ == "__main__":
     main()
